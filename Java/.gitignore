@@ -1,0 +1,11 @@
+# Java files
+*.class
+
+# Package Files
+*.jar
+*.war
+*.ear
+
+# Java-IDEs Files
+.idea/
+*.project
