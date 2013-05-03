@@ -3,6 +3,7 @@
 #define TCPCONNECTION_H
 #include <QtCore>
 #include <QtNetwork/QTcpSocket>
+#include <QtNetwork/QAbstractSocket>
 /*
  * QTcpSocket connect wrapper
  * TODO: add SSL
@@ -17,8 +18,8 @@ public slots:
 protected:
     QTcpSocket tcpSocket;
 private:
-    const QString hostName;
+    const QString _hostName;
     const quint16 _port;
-    static constexpr quint16 waitForConnectedTimemsecs = 5000;
+    static constexpr quint16 _waitForConnectedTimemsecs = 5000;
 };
 #endif // TCPCONNECTION_H

@@ -2,6 +2,7 @@
 #include <QIODevice>
 #include <QJsonDocument>
 #include <QVariant>
+#include <QMap>
 #include <QHostAddress>
 
 CLBattleService::CLBattleService(const QString &hostName, quint16 port, QObject* parent) :
@@ -24,7 +25,7 @@ void CLBattleService::writeData()
     }
 void CLBattleService::readData()
     {
-    const auto jsonText = tcpSocket.readAll();
+    const QByteArray jsonText = tcpSocket.readAll();
     QJsonParseError jsonError ;
     const QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonText, &jsonError);
     if(!jsonDocument.isNull())
@@ -37,27 +38,21 @@ void CLBattleService::readData()
                  ? tcpSocket.peerName() : readenHostName);
         bool ok;
         const quint64 battleConnectPort = connectJsonObject.value(JSONKey_connectPort).toVariant().toULongLong(&ok);
-        if(ok){
-            CLBattleServer* newBattle = new CLBattleServer(battleConnectHost, battleConnectPort, this);
-            battlesList << newBattle;
-            newBattle->connectServer();
-            }
-        else
-            warning(QString("wrong convert ") + JSONKey_connectPort);
+        Q_ASSERT(ok==true);
+        CLBattleServer* const newBattle = new CLBattleServer(battleConnectHost, battleConnectPort, this);
+        battlesList << newBattle;
+        QTimer::singleShot(0, newBattle, SLOT(connectServer()));
         }
     else
-        warning(QString("parse JSON error in %2 symb of \"%1\": - err :\"%3\"").arg(QString(jsonText)).
+        sendError(QString("JSON error in %2 symb of \"%1\": - err :\"%3\"").arg(QString(jsonText)).
                 arg(jsonError.offset).arg(jsonError.errorString()));
     }
-
-
-void CLBattleService::warning(const QString &errMessage)
+void CLBattleService::sendError(const QString &errMessage)
     {
     qWarning() << errMessage;
-
     QJsonDocument jsonDocument;
     QVariantMap errInfo;
-    errInfo.insert(JSONKey_countBattles,  QThread::idealThreadCount());
+    errInfo.insert(JSONKey_error,  QThread::idealThreadCount());
     jsonDocument.setObject(QJsonObject::fromVariantMap(errInfo));
     if(jsonDocument.isNull())
         qWarning() << "JSON serialize error";

@@ -13,15 +13,16 @@ class CLBattleService : public TCPConnection
 {
     Q_OBJECT
 public:
-    explicit CLBattleService(const QString &hostName, quint16 port, QObject *parent = NULL);
+    explicit CLBattleService(const QString &_hostName, quint16 port, QObject *parent = NULL);
     static constexpr auto JSONKey_countBattles      = "countBattles";
     static constexpr auto JSONKey_connectAddress    = "connectAddress";
     static constexpr auto JSONKey_connectPort       = "connectPort";
+    static constexpr auto JSONKey_error             = "error";
 protected slots:
     void writeData();
     void readData();
 protected:
-    void warning(const QString& str);
+    void sendError(const QString& str);
     QList<CLBattleServer*> battlesList;
 };      //CrimsonLineMaineService
 #endif  // CrimsonLineMaineService_H
