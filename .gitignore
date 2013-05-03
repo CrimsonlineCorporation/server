@@ -1,13 +1,10 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
+# Windows-specific files
+Thumbs.db
+desktop.ini
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
+# Mac-specific thing
+*.users (thanks to Michael Aaron Safyan)
+.DS_Store
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
+# Editors temporary files 
+*~
