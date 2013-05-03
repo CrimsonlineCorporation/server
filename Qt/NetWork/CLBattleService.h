@@ -1,27 +1,37 @@
 #pragma once
-#ifndef CrimsonLineMaineService_H
-#define CrimsonLineMaineService_H
+#ifndef CLBattleService_H
+#define CLBattleService_H
 #include <QtCore>
 #include <QObject>
 #include "tcpconnection.h"
-#include "CLBattleServer.h"
+#include <Box2D/Box2D.h>
 /*
- * This class connect to Java server and wait commandes to create battles
- * Handle battles.
+ * Battle engine with
+ *  * TCPServer implementaion
+ * TODO: * SciptEngine implementaion
  */
-class CLBattleService : public TCPConnection
+class CLBattleService : public QObject
 {
     Q_OBJECT
 public:
-    explicit CLBattleService(const QString &hostName, quint16 port, QObject *parent = NULL);
-    static constexpr auto JSONKey_countBattles      = "countBattles";
-    static constexpr auto JSONKey_connectAddress    = "connectAddress";
-    static constexpr auto JSONKey_connectPort       = "connectPort";
+    explicit CLBattleService(const QString &host, const quint16 port, QObject* parent = NULL);
+    inline void start();
+    static constexpr auto SendType_ID   = "sendType";
+    static constexpr auto BATTLE_ID     = "battleId";
+    static constexpr auto PLAYERS_NUM   = "playersNum";
+    static constexpr auto MONSTERS_NUM  = "monstersNum";
 protected slots:
     void writeData();
     void readData();
-protected:
-    void warning(const QString& str);
-    QList<CLBattleServer*> battlesList;
-};      //CrimsonLineMaineService
-#endif  // CrimsonLineMaineService_H
+private:
+    TCPConnection tcpConnection;
+    // Define world with zero gravity
+    b2World world{b2Vec2(0.0f, 0.0f)};
+    b2AABB worldAABB;
+    void createLive();
+};      // CLBattleService
+void CLBattleService::start()
+    {
+    tcpConnection.startConnectingServer();
+    }
+#endif  // CLBattleService_H
