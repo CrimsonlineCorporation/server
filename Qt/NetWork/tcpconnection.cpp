@@ -1,13 +1,14 @@
 #include "tcpconnection.h"
 
-TCPConnection::TCPConnection(const QString &host, quint16 port, QObject* parent) :
+TCPConnection::TCPConnection(const QString &host, const quint16 port, QObject* parent) :
     QObject(parent), hostName(host), _port(port)
     {
-    connect(&tcpSocket, SIGNAL(disconnected()), this, SLOT(connectServer()), Qt::QueuedConnection);
+    connect(&tcpSocket, &QTcpSocket::disconnected,
+            this, &TCPConnection::connectServer, Qt::QueuedConnection);
     connect(&tcpSocket, &QTcpSocket::error,
             [=](const QAbstractSocket::SocketError)
                     {
-                    qWarning() << "connect error :" << socketError;
+                    qWarning() << "TCP error :" << socketError;
                     } );
     }
 void TCPConnection::connectServer()
