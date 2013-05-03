@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     settings.beginGroup("connect");
 
     CLService service(settings.value("adress","192.168.1.109").toString(),
-                      settings.value("port",  "50000").toInt());
+                      settings.value("port",  "40000").toInt());
     service.start();
     return app.exec();
     }
