@@ -1,6 +1,6 @@
 #pragma once
-#ifndef CLBattleServer_H
-#define CLBattleServer_H
+#ifndef CLBattleService_H
+#define CLBattleService_H
 #include <QtCore>
 #include <QObject>
 #include "tcpconnection.h"
@@ -10,12 +10,12 @@
  *  * TCPServer implementaion
  * TODO: * SciptEngine implementaion
  */
-class CLBattleServer : public QObject
+class CLBattleService : public QObject
 {
     Q_OBJECT
 public:
-    explicit CLBattleServer(const QString &host, const quint16 port,
-                            QObject* parent = NULL);
+    explicit CLBattleService(const QString &host, const quint16 port, QObject* parent = NULL);
+    inline void start();
     static constexpr auto SendType_ID   = "sendType";
     static constexpr auto BATTLE_ID     = "battleId";
     static constexpr auto PLAYERS_NUM   = "playersNum";
@@ -29,5 +29,9 @@ private:
     b2World world{b2Vec2(0.0f, 0.0f)};
     b2AABB worldAABB;
     void createLive();
-};      // CLBattleServer_H
-#endif  // CLBattleServer_H
+};      // CLBattleService
+void CLBattleService::start()
+    {
+    tcpConnection.startConnectingServer();
+    }
+#endif  // CLBattleService_H

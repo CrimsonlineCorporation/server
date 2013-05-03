@@ -11,10 +11,6 @@ CLService::CLService(const QString &host, quint16 port, QObject* parent) :
     connect(&tcpConnection, &TCPConnection::connected, this, &CLService::writeData);
     connect(&tcpConnection, &TCPConnection::readyRead, this, &CLService::readData);
     }
-void CLService::start()
-    {
-    tcpConnection.startConnectingServer();
-    }
 void CLService::writeData()
     {
     QVariantMap battleServerInfo;
@@ -43,9 +39,9 @@ void CLService::readData()
         bool ok;
         const quint64 battleConnectPort = connectJsonObject.value(JSONKey_connectPort).toVariant().toULongLong(&ok);
         Q_ASSERT(ok==true);
-        CLBattleServer* const newBattle = new CLBattleServer(battleConnectHost, battleConnectPort, this);
+        CLBattleService* const newBattle = new CLBattleService(battleConnectHost, battleConnectPort, this);
         battlesList << newBattle;
-        QTimer::singleShot(0, newBattle, SLOT(startConnectingServer()));
+        newBattle->start();
         }
     else
         sendError(QString("JSON error in %2 symb of \"%1\": - err :\"%3\"").arg(QString(jsonText)).

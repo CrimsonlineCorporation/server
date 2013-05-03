@@ -1,17 +1,17 @@
-#include "CLBattleServer.h"
+#include "CLBattleService.h"
 #include <QJsonDocument>
 
-CLBattleServer::CLBattleServer(const QString &host, const quint16 port, QObject *parent) :
+CLBattleService::CLBattleService(const QString &host, const quint16 port, QObject *parent) :
     QObject(parent), tcpConnection(host, port, parent)
     {
-    connect(&tcpConnection, &TCPConnection::connected, this, &CLBattleServer::writeData);
-    connect(&tcpConnection, &TCPConnection::readyRead, this, &CLBattleServer::readData);
+    connect(&tcpConnection, &TCPConnection::connected, this, &CLBattleService::writeData);
+    connect(&tcpConnection, &TCPConnection::readyRead, this, &CLBattleService::readData);
 
     worldAABB.lowerBound.Set(-200,-100);
     worldAABB.upperBound.Set( 200, 500);
     world.Step(0.1, 1, 1);
     }
-void CLBattleServer::writeData()
+void CLBattleService::writeData()
     {
     QVariantMap battleServer;
     battleServer[QLatin1Literal("hello")] = QLatin1Literal("I don't know what I should send =(");
@@ -23,10 +23,10 @@ void CLBattleServer::writeData()
     qDebug() << "writing :" << dataArrayUTF8;
     tcpConnection.write(dataArrayUTF8);
     }
-void CLBattleServer::readData()
+void CLBattleService::readData()
     {
     }
-void CLBattleServer::createLive()
+void CLBattleService::createLive()
     {
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
