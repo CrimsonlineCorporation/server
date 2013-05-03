@@ -1,17 +1,21 @@
-#include "CLBattleService.h"
+#include "CLService.h"
 #include <QIODevice>
 #include <QJsonDocument>
 #include <QVariant>
 #include <QMap>
 #include <QHostAddress>
 
-CLBattleService::CLBattleService(const QString &hostName, quint16 port, QObject* parent) :
-    TCPConnection(hostName, port, parent)
+CLService::CLService(const QString &host, quint16 port, QObject* parent) :
+    QObject(parent), tcpConnection(host, port, parent)
     {
-    connect(&tcpSocket, &QTcpSocket::connected, this, &CLBattleService::writeData);
-    connect(&tcpSocket, &QTcpSocket::readyRead, this, &CLBattleService::readData);
+    connect(&tcpConnection, &TCPConnection::connected, this, &CLService::writeData);
+    connect(&tcpConnection, &TCPConnection::readyRead, this, &CLService::readData);
     }
-void CLBattleService::writeData()
+void CLService::start()
+    {
+    tcpConnection.startConnectingServer();
+    }
+void CLService::writeData()
     {
     QVariantMap battleServerInfo;
     battleServerInfo.insert(JSONKey_countBattles,  QThread::idealThreadCount());
@@ -21,11 +25,11 @@ void CLBattleService::writeData()
         qWarning() << "JSON serialize error";
     const QByteArray dataArrayUTF8 = (jsonDocument.isNull() ? "JSON serialize error" : jsonDocument.toJson());
     qDebug() << "writing :" << dataArrayUTF8;
-    tcpSocket.write(dataArrayUTF8);
+    tcpConnection.write(dataArrayUTF8);
     }
-void CLBattleService::readData()
+void CLService::readData()
     {
-    const QByteArray jsonText = tcpSocket.readAll();
+    const QByteArray jsonText = tcpConnection.readAll();
     QJsonParseError jsonError ;
     const QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonText, &jsonError);
     if(!jsonDocument.isNull())
@@ -35,19 +39,19 @@ void CLBattleService::readData()
         const QHostAddress host(readenHostName);
         const QString battleConnectHost =
                 ((host==QHostAddress::LocalHost || host==QHostAddress::Null)
-                 ? tcpSocket.peerName() : readenHostName);
+                 ? tcpConnection.peerName() : readenHostName);
         bool ok;
         const quint64 battleConnectPort = connectJsonObject.value(JSONKey_connectPort).toVariant().toULongLong(&ok);
         Q_ASSERT(ok==true);
         CLBattleServer* const newBattle = new CLBattleServer(battleConnectHost, battleConnectPort, this);
         battlesList << newBattle;
-        QTimer::singleShot(0, newBattle, SLOT(connectServer()));
+        QTimer::singleShot(0, newBattle, SLOT(startConnectingServer()));
         }
     else
         sendError(QString("JSON error in %2 symb of \"%1\": - err :\"%3\"").arg(QString(jsonText)).
                 arg(jsonError.offset).arg(jsonError.errorString()));
     }
-void CLBattleService::sendError(const QString &errMessage)
+void CLService::sendError(const QString &errMessage)
     {
     qWarning() << errMessage;
     QJsonDocument jsonDocument;
@@ -56,5 +60,5 @@ void CLBattleService::sendError(const QString &errMessage)
     jsonDocument.setObject(QJsonObject::fromVariantMap(errInfo));
     if(jsonDocument.isNull())
         qWarning() << "JSON serialize error";
-    tcpSocket.write(jsonDocument.toJson());
+    tcpConnection.write(jsonDocument.toJson());
     }

@@ -8,15 +8,15 @@
  * QTcpSocket connect wrapper
  * TODO: add SSL
  */
-class TCPConnection : public QObject
+class TCPConnection : public QTcpSocket
 {
     Q_OBJECT
 public:
     explicit TCPConnection(const QString &host, const quint16 port, QObject *parent = NULL);
 public slots:
-    void connectServer();
-protected:
-    QTcpSocket tcpSocket;
+    void startConnectingServer();
+protected slots:
+    void showError(const QAbstractSocket::SocketError socketError) const;
 private:
     const QString _hostName;
     const quint16 _port;

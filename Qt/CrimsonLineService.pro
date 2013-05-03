@@ -22,9 +22,9 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    NetWork/tcpconnection.cpp \
-    NetWork/CLBattleService.cpp \
-    NetWork/CLBattleServer.cpp
+    NetWork/CLBattleServer.cpp \
+    NetWork/CLService.cpp \
+    NetWork/TCPConnection.cpp
 
 #Box2d
 BOX2D_WAY = e:/work/GameZZa/Box2D_v2.2.1
@@ -33,6 +33,6 @@ LIBS += -L $${BOX2D_WAY}/Build/Box2D
 LIBS += -l Box2D
 
 HEADERS += \
-    NetWork/tcpconnection.h \
-    NetWork/CLBattleService.h \
-    NetWork/CLBattleServer.h
+    NetWork/CLBattleServer.h \
+    NetWork/CLService.h \
+    NetWork/TCPConnection.h
