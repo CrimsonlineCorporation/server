@@ -14,8 +14,6 @@ public:
     explicit TCPConnection(const QString &host, quint16 port, QObject *parent = NULL);
 public slots:
     void connectServer();
-protected slots:
-    void displayError(QAbstractSocket::SocketError socketError);
 protected:
     QTcpSocket tcpSocket;
 private:
