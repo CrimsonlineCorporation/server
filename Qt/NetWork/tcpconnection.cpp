@@ -5,10 +5,6 @@ TCPConnection::TCPConnection(const QString &host, const quint16 port, QObject* p
     {
     connect(&tcpSocket, &QAbstractSocket::disconnected,
             this, &TCPConnection::connectServer, Qt::QueuedConnection);
-    connect(&tcpSocket, &QAbstractSocket::stateChanged,
-            [](QAbstractSocket::SocketState)
-                    {
-                    } );
     void (QTcpSocket::*errSignal)(QAbstractSocket::SocketError)  = &QTcpSocket::error;
     connect(&tcpSocket, errSignal,
             [](const QAbstractSocket::SocketError socketError)
