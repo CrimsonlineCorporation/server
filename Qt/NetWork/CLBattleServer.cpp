@@ -4,8 +4,8 @@
 CLBattleServer::CLBattleServer(const QString &host, const quint16 port, QObject *parent) :
     TCPConnection(host, port, parent)
     {
-    connect(&tcpSocket, SIGNAL(connected()), this, SLOT(writeData()));
-    connect(&tcpSocket, SIGNAL(readyRead()), this, SLOT(readData()));
+    connect(&tcpSocket, &TCPConnection::connected, this, &CLBattleServer::writeData);
+    connect(&tcpSocket, &TCPConnection::readyRead, this, &CLBattleServer::readData);
     }
 void CLBattleServer::writeData()
     {

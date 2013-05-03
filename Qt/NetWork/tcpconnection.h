@@ -11,11 +11,9 @@ class TCPConnection : public QObject
 {
     Q_OBJECT
 public:
-    explicit TCPConnection(const QString &host, quint16 port, QObject *parent = NULL);
+    explicit TCPConnection(const QString &host, const quint16 port, QObject *parent = NULL);
 public slots:
     void connectServer();
-protected slots:
-    void displayError(QAbstractSocket::SocketError socketError);
 protected:
     QTcpSocket tcpSocket;
 private:
@@ -23,5 +21,4 @@ private:
     const quint16 _port;
     static constexpr quint16 waitForConnectedTimemsecs = 5000;
 };
-
 #endif // TCPCONNECTION_H
