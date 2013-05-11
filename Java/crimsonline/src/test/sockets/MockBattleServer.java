@@ -15,7 +15,7 @@ import static test.sockets.BattleServersRecorder.*;
  * Date: 09.05.13
  * Time: 21:58
  */
-public class BattleServerSocketInitializer {
+public class MockBattleServer {
     private final static int COUNT_BATTLES = 13;
 
     public static void main(String[] args) {

@@ -1,0 +1,1 @@
+asadmin set server.ejb-container.property.disable-nonportable-jndi-names="true"

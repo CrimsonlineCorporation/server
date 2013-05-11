@@ -5,11 +5,9 @@ import test.BattleClientBean;
 import test.beans.BattleCreationRequest;
 import test.beans.BattleServerRegistration;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.EJB;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
+import javax.annotation.Resource;
+import javax.ejb.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,22 +17,29 @@ import java.net.Socket;
  * Date: 03.05.13
  * Time: 18:16
  */
-@Startup
-@Singleton(name = "JsonSimpleTransmitterEJB")
-public class BattleServersRecorder {
+@Singleton
+public class BattleServersRecorder implements IBattleServersRecorder {
     public static final int PORT_NUMBER = 40000;
     public static final String CHARSET_NAME = "UTF-8";
     public static final String LOCALHOST = "localhost";
-
+    public static final long TIMEOUT_TO_BATTLE_SERVER_RECORDER_START = 1000;
     @EJB
     BattleClientBean battleClient;
+    @Resource
+    private TimerService timerService;
 
     public BattleServersRecorder() {
     }
 
-    @PostConstruct
-    protected void initTransmitter() {
-        System.out.println("Transmitter is ready.");
+    public void initRecorder() {
+        TimerConfig timerConfig = new TimerConfig();
+        timerConfig.setPersistent(false);
+        timerService.createSingleActionTimer(TIMEOUT_TO_BATTLE_SERVER_RECORDER_START, timerConfig);
+    }
+
+    @Timeout
+    public void listen() {
+        System.out.println("Recorder is started.");
         try (ServerSocket serverSocket = new ServerSocket(PORT_NUMBER)) {
             while (!serverSocket.isClosed()) {
                 System.out.println("Socket is still opened...");
@@ -91,6 +96,6 @@ public class BattleServersRecorder {
 
     @PreDestroy
     protected void finishTransmitter() {
-        System.out.println("Transmitter is finished.");
+        System.out.println("Recorder is finished.");
     }
 }
