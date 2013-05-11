@@ -59,7 +59,6 @@ public class BattleServersRecorder implements IBattleServersRecorder {
 
                     BattleCreationRequest request = new BattleCreationRequest(LOCALHOST, connectPort);
                     sendBattleAddress(request, writer);
-                    writer.flush();
                 }
 
                 System.out.println("Stop data transmission.");
@@ -91,7 +90,7 @@ public class BattleServersRecorder implements IBattleServersRecorder {
 
     private PrintWriter createWriter(final Socket socket) throws IOException {
         OutputStream out = socket.getOutputStream();
-        return new PrintWriter(new BufferedWriter(new OutputStreamWriter(out, CHARSET_NAME)));
+        return new PrintWriter(new BufferedWriter(new OutputStreamWriter(out, CHARSET_NAME)), true);
     }
 
     @PreDestroy
