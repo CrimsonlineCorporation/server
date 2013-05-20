@@ -1,5 +1,8 @@
 package test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.ejb.Singleton;
@@ -20,6 +23,7 @@ public class BattleClientBean {
     private static final long TIMEOUT_TO_TRANSMITTER_START = 1000;
     private ServerSocket serverSocket;
     private Socket clientSocket;
+    private final Logger logger = LoggerFactory.getLogger(BattleClientBean.class);
     @Resource
     private TimerService timerService;
 
@@ -39,17 +43,17 @@ public class BattleClientBean {
 
     @Timeout
     protected void listen() {
-        System.out.println("Transmitter is ready to connect...");
+        logger.info("Transmitter is ready to connect...");
         try {
             while (!serverSocket.isClosed()) {
-                System.out.println("Start listening for battle data...");
+                logger.debug("Start listening for battle data...");
                 clientSocket = serverSocket.accept();
-                System.out.println("Connection with battle server is established.");
+                logger.debug("Connection with battle server is established.");
                 serverSocket.close();
-                System.out.println("Stop listening for battle data.");
+                logger.debug("Stop listening for battle data.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("An error occurred during work of battle-server listener.", e);
         }
     }
 
@@ -57,11 +61,11 @@ public class BattleClientBean {
     public void stopClient() {
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {
-                System.out.println("Transmitter's socket will be closed.");
+                logger.info("Transmitter's socket will be closed.");
                 serverSocket.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("An error occurred during stopping of battle-server listener.", e);
         }
     }
 }

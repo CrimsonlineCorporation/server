@@ -1,6 +1,8 @@
 package test.sockets.mock;
 
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import test.beans.BattleCreationRequest;
 import test.beans.BattleServerRegistration;
 
@@ -18,8 +20,9 @@ import static test.sockets.BattleServersRecorder.PORT_NUMBER;
  * Time: 21:58
  */
 public class MockBattleServer extends AbstractSocketMock {
-    private final static int COUNT_BATTLES = 13;
     private BattleCreationRequest address;
+    private final static int COUNT_BATTLES = 13;
+    private final Logger logger = LoggerFactory.getLogger(MockBattleServer.class);
 
     public static void main(String[] args) {
         MockBattleServer mockBattleServer = new MockBattleServer();
@@ -29,10 +32,10 @@ public class MockBattleServer extends AbstractSocketMock {
 
     @Override
     protected void interact() throws IOException {
-        System.out.println("Send request...");
+        logger.debug("Send request...");
         sendBattleServerRegistration(writer, COUNT_BATTLES);
 
-        System.out.println("Read response...");
+        logger.debug("Read response...");
         address = readAddress(reader);
     }
 
@@ -44,7 +47,7 @@ public class MockBattleServer extends AbstractSocketMock {
         BattleServerRegistration request = new BattleServerRegistration(countOfBattles);
         Gson gson = new Gson();
         String json = gson.toJson(request, BattleServerRegistration.class);
-        System.out.println("  Request for registration: " + json);
+        logger.debug("  Request for registration: {}", json);
         writer.println(json);
     }
 
@@ -53,16 +56,16 @@ public class MockBattleServer extends AbstractSocketMock {
         String json = reader.readLine();
         BattleCreationRequest response = gson.fromJson(json, BattleCreationRequest.class);
         if (response != null) {
-            System.out.println("  Got address: " + response.getConnectAddress() + ":" + response.getConnectPort());
+            logger.debug("  Got address: {}:{}",response.getConnectAddress(), response.getConnectPort());
         } else {
-            System.out.println("  Can't parse response!");
+            logger.error("  Can't parse response!");
         }
         return response;
     }
 
     private void connectToAddress(final BattleCreationRequest address) {
         if (address == null) {
-            System.out.println("  No address was passed!");
+            logger.error("  No address was passed!");
             return;
         }
         String host = address.getConnectAddress();

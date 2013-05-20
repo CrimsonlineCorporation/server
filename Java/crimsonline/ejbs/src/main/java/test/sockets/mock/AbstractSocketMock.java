@@ -1,5 +1,8 @@
 package test.sockets.mock;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -11,26 +14,26 @@ import static test.sockets.BattleServersRecorder.CHARSET_NAME;
  * Time: 13:32
  */
 public abstract class AbstractSocketMock {
-
+    private final Logger logger = LoggerFactory.getLogger(AbstractSocketMock.class);
     protected BufferedReader reader;
     protected PrintWriter writer;
 
     public void mock(String hostname, int port) {
         try {
-            System.out.println("Connecting to " + hostname + ":" + port + "...");
+            logger.debug("Connecting to {}:{}...", hostname, port);
             Socket clientSocket = new Socket(hostname, port);
 
             reader = createReader(clientSocket);
             writer = createWriter(clientSocket);
 
-            System.out.println("Start data transmitting...");
+            logger.debug("Start data transmitting...");
             interact();
-            System.out.println("Data transmission is finished.");
+            logger.debug("Data transmission is finished.");
 
-            System.out.println("Closing socket...");
+            logger.debug("Closing socket...");
             clientSocket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("An error occurred during mocking of socket!", e);
         }
     }
 

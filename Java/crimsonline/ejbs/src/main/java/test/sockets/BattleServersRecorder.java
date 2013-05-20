@@ -1,6 +1,8 @@
 package test.sockets;
 
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import test.BattleClientBean;
 import test.beans.BattleCreationRequest;
 import test.beans.BattleServerRegistration;
@@ -23,6 +25,7 @@ public class BattleServersRecorder implements IBattleServersRecorder {
     public static final String CHARSET_NAME = "UTF-8";
     public static final String LOCALHOST = "localhost";
     public static final long TIMEOUT_TO_BATTLE_SERVER_RECORDER_START = 1000;
+    private final Logger logger = LoggerFactory.getLogger(BattleServersRecorder.class);
     @EJB
     BattleClientBean battleClient;
     @Resource
@@ -39,40 +42,41 @@ public class BattleServersRecorder implements IBattleServersRecorder {
 
     @Timeout
     public void listen() {
-        System.out.println("Recorder is started.");
+        logger.info("Recorder is started.");
         try (ServerSocket serverSocket = new ServerSocket(PORT_NUMBER)) {
             while (!serverSocket.isClosed()) {
-                System.out.println("Socket is still opened...");
+                logger.debug("Socket is still opened...");
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Accepted connection from client...");
+                logger.debug("Accepted connection from client...");
 
                 BufferedReader reader = createReader(clientSocket);
                 PrintWriter writer = createWriter(clientSocket);
 
                 int battleCount = getCountBattles(reader);
-                System.out.println("Received '" + battleCount + "' count of battles");
+                logger.debug("Received {} count of battles.", battleCount);
 
                 if (battleCount > 0) {
                     int connectPort = battleClient.getPort();
-                    System.out.println("Port is '" + connectPort + "'");
+                    logger.debug("Port is {}", connectPort);
                     battleClient.startListen();
 
                     BattleCreationRequest request = new BattleCreationRequest(LOCALHOST, connectPort);
                     sendBattleAddress(request, writer);
                 }
 
-                System.out.println("Stop data transmission.");
+                logger.debug("Stop data transmission.");
                 serverSocket.close();
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("An error occurred during server's registration.", e);
         }
     }
 
     private int getCountBattles(final BufferedReader reader) throws IOException {
         Gson parser = new Gson();
         String json = reader.readLine();
+        logger.trace("Received request for battle-server registration - {}", json);
         BattleServerRegistration registration = parser.fromJson(json, BattleServerRegistration.class);
         return registration == null ? -1 : registration.getCountBattles();
     }
@@ -80,6 +84,7 @@ public class BattleServersRecorder implements IBattleServersRecorder {
     private void sendBattleAddress(final BattleCreationRequest request, final PrintWriter writer) {
         Gson parser = new Gson();
         String json = parser.toJson(request, BattleCreationRequest.class);
+        logger.trace("Listener for battle server is placed on {}", json);
         writer.println(json);
     }
 
@@ -95,6 +100,6 @@ public class BattleServersRecorder implements IBattleServersRecorder {
 
     @PreDestroy
     protected void finishTransmitter() {
-        System.out.println("Recorder is finished.");
+        logger.debug("Recorder is finished.");
     }
 }

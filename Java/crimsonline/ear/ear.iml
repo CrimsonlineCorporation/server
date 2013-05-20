@@ -4,7 +4,7 @@
     <facet type="javaeeApplication" name="JavaEE">
       <configuration>
         <descriptors>
-          <deploymentDescriptor name="application.xml" url="file://$MODULE_DIR$/META-INF/application.xml" />
+          <deploymentDescriptor name="application.xml" url="file://$MODULE_DIR$/target/application.xml" />
         </descriptors>
       </configuration>
     </facet>
@@ -23,6 +23,9 @@
     <orderEntry type="library" name="Maven: com.sun.mail:javax.mail:1.5.0" level="project" />
     <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.2.4" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.5" level="project" />
+    <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.0.13" level="project" />
+    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.0.13" level="project" />
     <orderEntry type="module" module-name="web-face" />
   </component>
 </module>
